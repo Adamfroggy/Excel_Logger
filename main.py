@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 from tkinter import Tk, filedialog
 from docx import Document
+import PyPDF2  # Importing PyPDF2 to handle PDF files
 
 
 # Function to read text files
@@ -27,14 +28,27 @@ def read_docx(file_path):
         return None
 
 
+# Function to read .pdf files
+def read_pdf(file_path):
+    try:
+        with open(file_path, 'rb') as file:
+            reader = PyPDF2.PdfReader(file)
+            content = [page.extract_text() for page in reader.pages
+                       if page.extract_text().strip()]
+        return content
+    except Exception as e:
+        print(f"Error reading .pdf file: {e}")
+        return None
+
+
 # Function to handle the file upload
 def file_upload():
     root = Tk()
-    root.withdraw()  # Hide the Tkinter root window
+    root.withdraw()
     file_path = filedialog.askopenfilename(title="Select file",
                                            filetypes=[("Text files", "*.txt"),
-                                                      ("Word files",
-                                                       "*.docx")])
+                                                      ("Word files", "*.docx"),
+                                                      ("PDF files", "*.pdf")])
 
     if not file_path:
         print("No file selected. Exiting.")
@@ -46,12 +60,13 @@ def file_upload():
 
 # Function to parse the document
 def parse_document(file_path):
-    # Get file extension
     file_extension = os.path.splitext(file_path)[1].lower()
     if file_extension == '.txt':
         return read_txt(file_path)
     elif file_extension == '.docx':
         return read_docx(file_path)
+    elif file_extension == '.pdf':
+        return read_pdf(file_path)
     else:
         print(f"Unsupported file format: {file_extension}")
         return None
@@ -61,7 +76,7 @@ def parse_document(file_path):
 def log_to_excel(parsed_data, file_name):
     try:
         data = [{'Section': f'Section {i+1}', 'Content': line.strip(),
-                'Document Name': file_name, 'Timestamp': datetime.now()}
+                 'Document Name': file_name, 'Timestamp': datetime.now()}
                 for i, line in enumerate(parsed_data)]
 
         df = pd.DataFrame(data)
