@@ -7,21 +7,28 @@ from docx import Document
 
 # Function to read text files
 def read_txt(file_path):
-    with open(file_path, 'r', encoding='utf-8') as file:
-        content = file.readlines()
-    return content
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.readlines()
+        return content
+    except Exception as e:
+        print(f"Error reading .txt file: {e}")
+        return None
 
 
 # Function to read .docx files
 def read_docx(file_path):
-    doc = Document(file_path)
-    content = [para.text for para in doc.paragraphs if para.text.strip()]
-    return content
+    try:
+        doc = Document(file_path)
+        content = [para.text for para in doc.paragraphs if para.text.strip()]
+        return content
+    except Exception as e:
+        print(f"Error reading .docx file: {e}")
+        return None
 
 
 # Function to handle the file upload
 def file_upload():
-    # Open file dialog to allow the user to select a file
     root = Tk()
     root.withdraw()  # Hide the Tkinter root window
     file_path = filedialog.askopenfilename(title="Select file",
@@ -39,8 +46,8 @@ def file_upload():
 
 # Function to parse the document
 def parse_document(file_path):
-    file_extension = os.path.splitext(file_path)[1].lower()
     # Get file extension
+    file_extension = os.path.splitext(file_path)[1].lower()
     if file_extension == '.txt':
         return read_txt(file_path)
     elif file_extension == '.docx':
@@ -52,37 +59,33 @@ def parse_document(file_path):
 
 # Function to log parsed data to Excel
 def log_to_excel(parsed_data, file_name):
-    # Prepare data for logging
-    data = [{'Section': f'Section {i+1}', 'Content': line.strip(),
-             'Document Name': file_name, 'Timestamp': datetime.now()}
-            for i, line in enumerate(parsed_data)]
+    try:
+        data = [{'Section': f'Section {i+1}', 'Content': line.strip(),
+                'Document Name': file_name, 'Timestamp': datetime.now()}
+                for i, line in enumerate(parsed_data)]
 
-    # Convert to DataFrame
-    df = pd.DataFrame(data)
+        df = pd.DataFrame(data)
 
-    # Write to Excel (append without overwriting existing content)
-    with pd.ExcelWriter('doc_log.xlsx', mode='a', engine='openpyxl',
-                        if_sheet_exists='overlay') as writer:
-        df.to_excel(writer, index=False, header=not writer.sheets)
-        # Add data without overwriting existing logs
+        with pd.ExcelWriter('doc_log.xlsx', mode='a', engine='openpyxl',
+                            if_sheet_exists='overlay') as writer:
+            df.to_excel(writer, index=False, header=not writer.sheets)
 
-    print("Data successfully written to doc_log.xlsx")
+        print("Data successfully written to doc_log.xlsx")
+    except Exception as e:
+        print(f"Error writing to Excel: {e}")
 
 
 # Main function to handle the process
 def main():
-    # Step 1: Upload file
     file_path = file_upload()
     if not file_path:
         return
 
-    # Step 2: Parse document based on file type
     parsed_data = parse_document(file_path)
     if not parsed_data:
         return
 
-    # Step 3: Log the parsed content to Excel
-    file_name = os.path.basename(file_path)  # Extract just the file name
+    file_name = os.path.basename(file_path)
     log_to_excel(parsed_data, file_name)
 
 
