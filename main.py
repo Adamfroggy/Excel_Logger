@@ -5,7 +5,8 @@ from tkinter import Tk, filedialog
 from docx import Document
 import PyPDF2
 import argparse
-import logging  # Import logging for error and success tracking
+import logging
+import json  # Added for JSON support
 
 # Configure logging
 logging.basicConfig(filename='doc_logger.log', level=logging.INFO,
@@ -50,6 +51,31 @@ def read_pdf(file_path):
         return None
 
 
+# Function to read CSV files
+def read_csv(file_path):
+    try:
+        df = pd.read_csv(file_path)
+        content = df.to_string(index=False).splitlines()
+        logging.info(f"Successfully read .csv file: {file_path}")
+        return content
+    except Exception as e:
+        logging.error(f"Error reading .csv file: {e}")
+        return None
+
+
+# Function to read JSON files
+def read_json(file_path):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+        content = json.dumps(data, indent=4).splitlines()
+        logging.info(f"Successfully read .json file: {file_path}")
+        return content
+    except Exception as e:
+        logging.error(f"Error reading .json file: {e}")
+        return None
+
+
 # Function to handle the file upload through a GUI
 def file_upload_gui():
     root = Tk()
@@ -57,7 +83,10 @@ def file_upload_gui():
     file_path = filedialog.askopenfilename(title="Select file",
                                            filetypes=[("Text files", "*.txt"),
                                                       ("Word files", "*.docx"),
-                                                      ("PDF files", "*.pdf")])
+                                                      ("PDF files", "*.pdf"),
+                                                      ("CSV files", "*.csv"),
+                                                      ("JSON files",
+                                                       "*.json")])
 
     if not file_path:
         logging.warning("No file selected through GUI.")
@@ -77,6 +106,10 @@ def parse_document(file_path):
         return read_docx(file_path)
     elif file_extension == '.pdf':
         return read_pdf(file_path)
+    elif file_extension == '.csv':
+        return read_csv(file_path)
+    elif file_extension == '.json':
+        return read_json(file_path)
     else:
         logging.error(f"Unsupported file format: {file_extension}")
         print(f"Unsupported file format: {file_extension}")
