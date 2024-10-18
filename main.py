@@ -4,7 +4,12 @@ from datetime import datetime
 from tkinter import Tk, filedialog
 from docx import Document
 import PyPDF2
-import argparse  # Import argparse for CLI support
+import argparse
+import logging  # Import logging for error and success tracking
+
+# Configure logging
+logging.basicConfig(filename='doc_logger.log', level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 # Function to read text files
@@ -12,9 +17,10 @@ def read_txt(file_path):
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
             content = file.readlines()
+        logging.info(f"Successfully read .txt file: {file_path}")
         return content
     except Exception as e:
-        print(f"Error reading .txt file: {e}")
+        logging.error(f"Error reading .txt file: {e}")
         return None
 
 
@@ -23,9 +29,10 @@ def read_docx(file_path):
     try:
         doc = Document(file_path)
         content = [para.text for para in doc.paragraphs if para.text.strip()]
+        logging.info(f"Successfully read .docx file: {file_path}")
         return content
     except Exception as e:
-        print(f"Error reading .docx file: {e}")
+        logging.error(f"Error reading .docx file: {e}")
         return None
 
 
@@ -36,9 +43,10 @@ def read_pdf(file_path):
             reader = PyPDF2.PdfReader(file)
             content = [page.extract_text() for page in reader.pages
                        if page.extract_text().strip()]
+        logging.info(f"Successfully read .pdf file: {file_path}")
         return content
     except Exception as e:
-        print(f"Error reading .pdf file: {e}")
+        logging.error(f"Error reading .pdf file: {e}")
         return None
 
 
@@ -52,10 +60,11 @@ def file_upload_gui():
                                                       ("PDF files", "*.pdf")])
 
     if not file_path:
+        logging.warning("No file selected through GUI.")
         print("No file selected. Exiting.")
         return None
 
-    print(f"File selected: {file_path}")
+    logging.info(f"File selected via GUI: {file_path}")
     return file_path
 
 
@@ -69,6 +78,7 @@ def parse_document(file_path):
     elif file_extension == '.pdf':
         return read_pdf(file_path)
     else:
+        logging.error(f"Unsupported file format: {file_extension}")
         print(f"Unsupported file format: {file_extension}")
         return None
 
@@ -86,8 +96,11 @@ def log_to_excel(parsed_data, file_name):
                             if_sheet_exists='overlay') as writer:
             df.to_excel(writer, index=False, header=not writer.sheets)
 
+        logging.info(f"Successfully logged data from {file_name} \
+                     to doc_log.xlsx")
         print("Data successfully written to doc_log.xlsx")
     except Exception as e:
+        logging.error(f"Error writing to Excel: {e}")
         print(f"Error writing to Excel: {e}")
 
 
@@ -105,6 +118,7 @@ def main():
     if args.file:
         file_path = args.file
         if not os.path.exists(file_path):
+            logging.error(f"File not found: {file_path}")
             print(f"File not found: {file_path}")
             return
     else:
