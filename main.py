@@ -3,7 +3,8 @@ import os
 from datetime import datetime
 from tkinter import Tk, filedialog
 from docx import Document
-import PyPDF2  # Importing PyPDF2 to handle PDF files
+import PyPDF2
+import argparse  # Import argparse for CLI support
 
 
 # Function to read text files
@@ -41,8 +42,8 @@ def read_pdf(file_path):
         return None
 
 
-# Function to handle the file upload
-def file_upload():
+# Function to handle the file upload through a GUI
+def file_upload_gui():
     root = Tk()
     root.withdraw()
     file_path = filedialog.askopenfilename(title="Select file",
@@ -58,7 +59,7 @@ def file_upload():
     return file_path
 
 
-# Function to parse the document
+# Function to parse the document based on its extension
 def parse_document(file_path):
     file_extension = os.path.splitext(file_path)[1].lower()
     if file_extension == '.txt':
@@ -92,9 +93,25 @@ def log_to_excel(parsed_data, file_name):
 
 # Main function to handle the process
 def main():
-    file_path = file_upload()
-    if not file_path:
-        return
+    # Create an argument parser for CLI support
+    parser = argparse.ArgumentParser(description="Document Logger - \
+                                     Uploads file content to an Excel log.")
+    parser.add_argument('--file', type=str,
+                        help='Path to the file to be logged')
+
+    # Parse arguments
+    args = parser.parse_args()
+
+    if args.file:
+        file_path = args.file
+        if not os.path.exists(file_path):
+            print(f"File not found: {file_path}")
+            return
+    else:
+        # If no file is provided via CLI, open GUI to select file
+        file_path = file_upload_gui()
+        if not file_path:
+            return
 
     parsed_data = parse_document(file_path)
     if not parsed_data:
