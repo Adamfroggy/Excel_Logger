@@ -139,13 +139,11 @@ def log_to_excel(parsed_data, file_name):
 
 # Main function to handle the process
 def main():
-    # Create an argument parser for CLI support
     parser = argparse.ArgumentParser(description="Document Logger - \
                                      Uploads file content to an Excel log.")
     parser.add_argument('--file', type=str,
                         help='Path to the file to be logged')
 
-    # Parse arguments
     args = parser.parse_args()
 
     if args.file:
@@ -155,17 +153,14 @@ def main():
             print(f"File not found: {file_path}")
             return
     else:
-        # If no file is provided via CLI, open GUI to select file
         file_path = file_upload_gui()
         if not file_path:
             return
 
     parsed_data = parse_document(file_path)
-    if not parsed_data:
-        return
-
-    file_name = os.path.basename(file_path)
-    log_to_excel(parsed_data, file_name)
+    if parsed_data:
+        file_name = os.path.basename(file_path)
+        log_to_excel(parsed_data, file_name)
 
 
 if __name__ == '__main__':
