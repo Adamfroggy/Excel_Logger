@@ -13,16 +13,18 @@ logging.basicConfig(filename='doc_logger.log', level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-# Function to read text files
+# Enhanced error handling for all file read functions
 def read_txt(file_path):
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
             content = file.readlines()
         logging.info(f"Successfully read .txt file: {file_path}")
         return content
+    except FileNotFoundError:
+        logging.error(f"File not found: {file_path}")
     except Exception as e:
         logging.error(f"Error reading .txt file: {e}")
-        return None
+    return None
 
 
 # Function to read .docx files
