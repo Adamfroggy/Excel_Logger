@@ -150,6 +150,7 @@ def main():
 
     if args.file:
         file_path = args.file
+        logging.info(f"CLI file upload: {file_path}")
         if not os.path.exists(file_path):
             logging.error(f"File not found: {file_path}")
             print(f"File not found: {file_path}")
