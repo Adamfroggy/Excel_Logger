@@ -169,5 +169,42 @@ def main():
         log_to_excel(parsed_data, file_name)
 
 
+def generate_summary_report():
+    try:
+        # Read the existing Excel log
+        df = pd.read_excel('doc_log.xlsx')
+
+        # Group by document name and file type to get some stats
+        doc_summary = df.groupby('Document Name').agg({
+            'Content': 'count',
+            'Timestamp': 'max'
+        }).reset_index()
+
+        num_docs = len(doc_summary)
+        total_lines = df['Content'].count()
+
+        # Create summary report
+        summary = "Summary Report:\n\n"
+        summary += f"Total Documents Processed: {num_docs}\n"
+        summary += f"Total Lines Logged: {total_lines}\n\n"
+        summary += "Document Details:\n"
+
+        for index, row in doc_summary.iterrows():
+            summary += f"Document: {row['Document Name']}, \
+            Lines: {row['Content']}, Last Updated: {row['Timestamp']}\n"
+
+        # Save the summary to a text file
+        with open('summary_report.txt', 'w') as file:
+            file.write(summary)
+
+        print("Summary report generated and saved as 'summary_report.txt'")
+
+    except Exception as e:
+        print(f"Error generating summary report: {e}")
+
+    except Exception as e:
+        print(f"Error generating summary report: {e}")
+
+
 if __name__ == '__main__':
     main()
