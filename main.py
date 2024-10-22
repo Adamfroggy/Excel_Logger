@@ -129,7 +129,10 @@ def log_to_excel(parsed_data, file_name):
 
         with pd.ExcelWriter('doc_log.xlsx', mode='a', engine='openpyxl',
                             if_sheet_exists='overlay') as writer:
-            df.to_excel(writer, index=False, header=not writer.sheets)
+            if not writer.sheets:
+                df.to_excel(writer, index=False)
+            else:
+                df.to_excel(writer, index=False, header=False)
 
         logging.info(f"Successfully logged data from {file_name} \
                      to doc_log.xlsx")
