@@ -118,6 +118,17 @@ def parse_document(file_path):
         return None
 
 
+def log_document(file_path):
+    # Validate file path and type
+    if not os.path.isfile(file_path):
+        print("Error: File does not exist.")
+        return
+    if not file_path.lower().endswith(('.txt', '.md')):
+        print("Error: Unsupported file type. Only .txt \
+              and .md files are allowed.")
+        return
+
+
 # Function to log parsed data to Excel
 def log_to_excel(parsed_data, file_name):
     try:
