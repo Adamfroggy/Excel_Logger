@@ -119,13 +119,9 @@ def parse_document(file_path):
 
 
 def log_document(file_path):
-    # Validate file path and type
     if not os.path.isfile(file_path):
+        logging.error("File does not exist.")
         print("Error: File does not exist.")
-        return
-    if not file_path.lower().endswith(('.txt', '.md')):
-        print("Error: Unsupported file type. Only .txt \
-              and .md files are allowed.")
         return
 
 
