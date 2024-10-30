@@ -181,7 +181,7 @@ def main():
 
 
 # Function to generate a summary report
-def generate_summary_report():
+def generate_summary_report(output_format='txt'):
     try:
         # Read the existing Excel log
         df = pd.read_excel('doc_log.xlsx')
@@ -216,6 +216,15 @@ def generate_summary_report():
 
     except Exception as e:
         print(f"Error generating summary report: {e}")
+
+    # Save the summary based on the specified format
+    if output_format == 'csv':
+        doc_summary.to_csv('summary_report.csv', index=False)
+        print("Summary report generated and saved as 'summary_report.csv'")
+    else:
+        with open('summary_report.txt', 'w') as file:
+            file.write(summary)
+        print("Summary report generated and saved as 'summary_report.txt'")
 
 
 def parse_args():
