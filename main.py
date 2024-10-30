@@ -13,6 +13,10 @@ logging.basicConfig(filename='doc_logger.log', level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 
+def format_date(date):
+    return date.strftime("%Y-%m-%d %H:%M:%S")
+
+
 # Enhanced error handling for all file read functions
 def read_txt(file_path):
     try:
