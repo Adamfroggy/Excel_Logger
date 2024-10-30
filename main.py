@@ -169,6 +169,7 @@ def main():
         log_to_excel(parsed_data, file_name)
 
 
+# Function to generate a summary report
 def generate_summary_report():
     try:
         # Read the existing Excel log
@@ -206,5 +207,19 @@ def generate_summary_report():
         print(f"Error generating summary report: {e}")
 
 
-if __name__ == '__main__':
-    main()
+def parse_args():
+    parser = argparse.ArgumentParser(description="Excel Logger")
+    parser.add_argument("file_path", type=str,
+                        help="Path to the document to be logged")
+    parser.add_argument("--generate-summary", action="store_true",
+                        help="Generate summary report after logging")
+    return parser.parse_args()
+
+
+args = parse_args()
+
+
+if __name__ == "__main__":
+    log_document(args.file_path)
+    if args.generate_summary:
+        generate_summary_report()
