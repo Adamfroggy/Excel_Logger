@@ -1,6 +1,7 @@
 import unittest
+import pandas as pd
 from main import read_txt, read_docx, read_pdf, read_csv, read_json, \
-                log_to_excel
+                log_to_excel, log_document
 import os
 
 
@@ -31,6 +32,24 @@ class TestDocumentLogger(unittest.TestCase):
         data = ["This is a test."]
         log_to_excel(data, "test_file")
         self.assertTrue(os.path.exists('doc_log.xlsx'))
+
+
+class TestLoggingFunctions(unittest.TestCase):
+    def test_log_document(self):
+        # Assume 'sample.txt' is a test document in your project directory
+        log_document('sample.txt')
+        # Check if 'doc_log.xlsx' is created
+        self.assertTrue(os.path.exists('doc_log.xlsx'))
+
+    def test_log_excel(self):
+        # Mock data for testing
+        data = pd.DataFrame({'Document Name': ['sample.txt'],
+                             'Content': ['Example content'],
+                             'Timestamp': ['2024-10-10']})
+        log_to_excel(data)
+        # Check if data was logged
+        logged_data = pd.read_excel('doc_log.xlsx')
+        self.assertIn('sample.txt', logged_data['Document Name'].values)
 
 
 if __name__ == '__main__':
