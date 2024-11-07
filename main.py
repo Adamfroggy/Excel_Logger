@@ -123,6 +123,15 @@ def parse_document(file_path):
 
 
 def log_document(file_path):
+    """
+    Logs content of the specified document to an Excel file.
+
+    Parameters:
+    file_path (str): Path to the document to be logged.
+
+    Returns:
+    None
+    """
     if not os.path.isfile(file_path):
         logging.error("File does not exist.")
         print("Error: File does not exist.")
@@ -131,6 +140,16 @@ def log_document(file_path):
 
 # Function to log parsed data to Excel
 def log_to_excel(parsed_data, file_name):
+    """
+    Appends data to the existing Excel log file or
+    creates a new one if it doesn't exist.
+
+    Parameters:
+    data (DataFrame): Data to be logged in the Excel file.
+
+    Returns:
+    None
+    """
     try:
         # Create the new data to log
         data = [{'Section': f'Section {i+1}', 'Content': line.strip(),
