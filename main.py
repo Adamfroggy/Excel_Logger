@@ -132,6 +132,14 @@ def log_document(file_path):
     Returns:
     None
     """
+    # Validate file path and type
+    if not os.path.isfile(file_path):
+        print("Error: File does not exist.")
+        return
+    if not file_path.lower().endswith(('.txt', '.md')):
+        print("Error: Unsupported file type. \
+              Supported types are .txt and .md.")
+        return
     if not os.path.isfile(file_path):
         logging.error("File does not exist.")
         print("Error: File does not exist.")
