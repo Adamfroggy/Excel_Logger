@@ -132,21 +132,27 @@ def log_document(file_path):
 # Function to log parsed data to Excel
 def log_to_excel(parsed_data, file_name):
     try:
+        # Create the new data to log
         data = [{'Section': f'Section {i+1}', 'Content': line.strip(),
                  'Document Name': file_name, 'Timestamp': datetime.now()}
                 for i, line in enumerate(parsed_data)]
 
         df = pd.DataFrame(data)
 
+        # Load existing data if the file exists
+        if os.path.exists('doc_log.xlsx'):
+            existing_df = pd.read_excel('doc_log.xlsx')
+            if file_name in existing_df['Document Name'].values:
+                print(f"{file_name} is already logged in doc_log.xlsx.")
+                return  # Skip logging if already present
+
+        # Append new data
         with pd.ExcelWriter('doc_log.xlsx', mode='a', engine='openpyxl',
                             if_sheet_exists='overlay') as writer:
-            if not writer.sheets:
-                df.to_excel(writer, index=False)
-            else:
-                df.to_excel(writer, index=False, header=False)
+            df.to_excel(writer, index=False, header=not writer.sheets)
 
-        logging.info(f"Successfully logged data from {file_name} \
-                     to doc_log.xlsx")
+        logging.info(f"Successfully logged data from \
+                     {file_name} to doc_log.xlsx")
         print("Data successfully written to doc_log.xlsx")
     except Exception as e:
         logging.error(f"Error writing to Excel: {e}")
