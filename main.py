@@ -187,6 +187,16 @@ def log_to_excel(parsed_data, file_name, log_path='doc_log.xlsx',
         print(f"Data successfully written to {log_path} in {sheet_name} sheet")
 
     except Exception as e:
+        error_data = [{'Error Message': str(e), 'Document Name': file_name,
+                       'Timestamp': datetime.now()}]
+        error_df = pd.DataFrame(error_data)
+
+        # Log error data in the 'Errors' sheet
+        with pd.ExcelWriter(log_path, mode='a', engine='openpyxl',
+                            if_sheet_exists='overlay') as writer:
+            error_df.to_excel(writer, sheet_name='Errors', index=False,
+                              header=not writer.sheets)
+
         logging.error(f"Error writing to Excel at {log_path}: {e}")
         print(f"Error writing to Excel: {e}")
 
