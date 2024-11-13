@@ -169,7 +169,13 @@ def log_to_excel(parsed_data, file_name, log_path='doc_log.xlsx',
 
         df = pd.DataFrame(data)
 
-        # Backup existing log file before appending new data
+        # Check if the document is already logged
+        if os.path.exists(log_path):
+            existing_df = pd.read_excel(log_path)
+            if file_name in existing_df['Document Name'].values:
+                print(f"{file_name} is already logged in doc_log.xlsx.")
+                return  # Skip logging if already present
+
         if os.path.exists(log_path):
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             backup_path = f"backup_{timestamp}_{log_path}"
