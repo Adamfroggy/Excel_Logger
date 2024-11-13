@@ -12,6 +12,8 @@ import json  # Added for JSON support
 logging.basicConfig(filename='doc_logger.log', level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
+LOG_PATH = 'doc_log.xlsx'
+
 
 def format_date(date):
     return date.strftime("%Y-%m-%d %H:%M:%S")
@@ -147,7 +149,8 @@ def log_document(file_path):
 
 
 # Function to log parsed data to Excel
-def log_to_excel(parsed_data, file_name):
+def log_to_excel(parsed_data, file_name, log_path='doc_log.xlsx',
+                 sheet_name='Documents'):
     """
     Appends data to the existing Excel log file or
     creates a new one if it doesn't exist.
@@ -166,23 +169,25 @@ def log_to_excel(parsed_data, file_name):
 
         df = pd.DataFrame(data)
 
-        # Load existing data if the file exists
-        if os.path.exists('doc_log.xlsx'):
-            existing_df = pd.read_excel('doc_log.xlsx')
-            if file_name in existing_df['Document Name'].values:
-                print(f"{file_name} is already logged in doc_log.xlsx.")
-                return  # Skip logging if already present
+        # Backup existing log file before appending new data
+        if os.path.exists(log_path):
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            backup_path = f"backup_{timestamp}_{log_path}"
+            os.rename(log_path, backup_path)
+            logging.info(f"Backup saved as {backup_path}")
 
-        # Append new data
-        with pd.ExcelWriter('doc_log.xlsx', mode='a', engine='openpyxl',
+        # Append data to Excel
+        with pd.ExcelWriter(log_path, mode='a', engine='openpyxl',
                             if_sheet_exists='overlay') as writer:
-            df.to_excel(writer, index=False, header=not writer.sheets)
+            df.to_excel(writer, sheet_name=sheet_name, index=False,
+                        header=not writer.sheets)
 
         logging.info(f"Successfully logged data from \
-                     {file_name} to doc_log.xlsx")
-        print("Data successfully written to doc_log.xlsx")
+                     {file_name} to {log_path} in {sheet_name} sheet")
+        print(f"Data successfully written to {log_path} in {sheet_name} sheet")
+
     except Exception as e:
-        logging.error(f"Error writing to Excel: {e}")
+        logging.error(f"Error writing to Excel at {log_path}: {e}")
         print(f"Error writing to Excel: {e}")
 
 
