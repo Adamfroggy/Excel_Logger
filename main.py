@@ -156,7 +156,10 @@ def log_to_excel(parsed_data, file_name, log_path='doc_log.xlsx',
     creates a new one if it doesn't exist.
 
     Parameters:
-    data (DataFrame): Data to be logged in the Excel file.
+    parsed_data (list): List of parsed document lines to be logged.
+    file_name (str): The name of the file being logged.
+    log_path (str): The path of the Excel log file. Default is 'doc_log.xlsx'.
+    sheet_name (str): The sheet name in the Excel file. Default is 'Documents'.
 
     Returns:
     None
@@ -173,9 +176,10 @@ def log_to_excel(parsed_data, file_name, log_path='doc_log.xlsx',
         if os.path.exists(log_path):
             existing_df = pd.read_excel(log_path)
             if file_name in existing_df['Document Name'].values:
-                print(f"{file_name} is already logged in doc_log.xlsx.")
+                print(f"{file_name} is already logged in {log_path}.")
                 return  # Skip logging if already present
 
+        # Backup the existing file if it exists
         if os.path.exists(log_path):
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             backup_path = f"backup_{timestamp}_{log_path}"
@@ -193,6 +197,7 @@ def log_to_excel(parsed_data, file_name, log_path='doc_log.xlsx',
         print(f"Data successfully written to {log_path} in {sheet_name} sheet")
 
     except Exception as e:
+        # Log error data in the 'Errors' sheet
         error_data = [{'Error Message': str(e), 'Document Name': file_name,
                        'Timestamp': datetime.now()}]
         error_df = pd.DataFrame(error_data)
