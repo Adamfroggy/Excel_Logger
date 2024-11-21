@@ -7,6 +7,7 @@ import PyPDF2
 import argparse
 import logging
 import json  # Added for JSON support
+import time
 
 # Configure logging
 logging.basicConfig(filename='doc_logger.log', level=logging.INFO,
@@ -167,6 +168,24 @@ def preview_parsed_content(parsed_data, preview_length=5):
     preview = '\n'.join(parsed_data[:preview_length])
     print(f"Preview of the parsed content:\n{preview}\n")
     return preview
+
+
+def read_txt_with_retry(file_path, retries=3, delay=2):
+    for attempt in range(retries):
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                content = file.readlines()
+            logging.info(f"Successfully read .txt file: {file_path}")
+            return content
+        except Exception as e:
+            logging.error(f"Error reading .txt file \
+            on attempt {attempt + 1}: {e}")
+            if attempt < retries - 1:
+                time.sleep(delay)  # Wait before retrying
+            else:
+                logging.error(f"Failed to read .txt file after \
+                {retries} attempts.")
+                return None
 
 
 # Function to log parsed data to Excel
