@@ -157,6 +157,22 @@ def log_document(file_path):
     logging.info(f"Document Metadata: {metadata}")
 
 
+def export_metadata_to_json(file_metadata, json_filename="metadata.json"):
+    """
+    Exports file metadata to a JSON file.
+
+    Parameters:
+    file_metadata (dict): Metadata dictionary to be saved.
+    json_filename (str): Name of the JSON file to save metadata.
+    """
+    try:
+        with open(json_filename, 'w', encoding='utf-8') as json_file:
+            json.dump(file_metadata, json_file, indent=4)
+        logging.info(f"Metadata exported to {json_filename}")
+    except Exception as e:
+        logging.error(f"Error exporting metadata to JSON: {e}")
+
+
 def preview_parsed_content(parsed_data, preview_length=5):
     """
     Display a preview of the parsed content.
