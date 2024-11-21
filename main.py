@@ -138,14 +138,22 @@ def log_document(file_path):
     if not os.path.isfile(file_path):
         print("Error: File does not exist.")
         return
-    if not file_path.lower().endswith(('.txt', '.md')):
-        print("Error: Unsupported file type. \
-              Supported types are .txt and .md.")
-        return
-    if not os.path.isfile(file_path):
-        logging.error("File does not exist.")
-        print("Error: File does not exist.")
-        return
+    file_name = os.path.basename(file_path)
+    # Get file size
+    file_size = os.path.getsize(file_path)
+    # Get file extension
+    file_extension = os.path.splitext(file_path)[1].lower()
+    document_id = f"{file_name}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+
+    # Add logging of metadata
+    metadata = {
+        "Document Name": file_name,
+        "File Size": file_size,
+        "File Type": file_extension,
+        "Document ID": document_id,
+        "Timestamp": datetime.now()
+    }
+    logging.info(f"Document Metadata: {metadata}")
 
 
 # Function to log parsed data to Excel
