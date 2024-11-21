@@ -156,6 +156,19 @@ def log_document(file_path):
     logging.info(f"Document Metadata: {metadata}")
 
 
+def preview_parsed_content(parsed_data, preview_length=5):
+    """
+    Display a preview of the parsed content.
+
+    Parameters:
+    parsed_data (list): List of parsed document lines.
+    preview_length (int): Number of lines to preview.
+    """
+    preview = '\n'.join(parsed_data[:preview_length])
+    print(f"Preview of the parsed content:\n{preview}\n")
+    return preview
+
+
 # Function to log parsed data to Excel
 def log_to_excel(parsed_data, file_name, log_path='doc_log.xlsx',
                  sheet_name='Documents'):
