@@ -107,5 +107,28 @@ class TestLargeFileHandling(unittest.TestCase):
         os.remove('large_test.csv')  # Clean up
 
 
+class TestCorruptedFileHandling(unittest.TestCase):
+    def test_read_corrupted_txt(self):
+        # Simulate corrupted file by writing an incomplete file
+        with open('corrupted.txt', 'w') as f:
+            # Incomplete or malformed content
+            f.write("This file is corrupted...")
+
+        result = read_txt('corrupted.txt')
+        self.assertIsNone(result)  # Should return None or handle the exception
+
+        os.remove('corrupted.txt')  # Clean up
+
+    def test_read_corrupted_csv(self):
+        # Simulate a corrupted CSV file
+        with open('corrupted.csv', 'w') as f:
+            f.write("Col1,Col2\nA,B\nC")  # Missing data in row
+
+        result = read_csv('corrupted.csv')
+        self.assertIsNone(result)  # Should return None or handle the exception
+
+        os.remove('corrupted.csv')  # Clean up
+
+
 if __name__ == '__main__':
     unittest.main()
