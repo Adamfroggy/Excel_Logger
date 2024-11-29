@@ -3,6 +3,7 @@ from unittest.mock import patch
 from datetime import datetime
 import pandas as pd
 from main import log_to_excel
+import os
 
 
 class TestLogToExcel(unittest.TestCase):
@@ -45,6 +46,24 @@ class TestInvalidExcelLogging(unittest.TestCase):
         # Assuming a KeyError if specific columns are missing
         with self.assertRaises(KeyError):
             log_to_excel(invalid_data)
+
+
+class TestExcelFileOpen(unittest.TestCase):
+    def test_excel_file_open(self):
+        # Simulating the case when the Excel file
+        # is open in another application
+        with open('doc_log.xlsx', 'w') as f:
+            f.write("Test")  # Writing to the file to simulate it being open
+
+        data = ["Test content."]
+        try:
+            # Attempt to log data while the file is open
+            log_to_excel(data, 'test_open_file.txt')
+            # File should still exist
+            self.assertTrue(os.path.exists('doc_log.xlsx'))
+        except PermissionError:
+            self.fail("PermissionError: Excel file is open. \
+                      Logging should handle this gracefully.")
 
 
 if __name__ == '__main__':
