@@ -30,5 +30,22 @@ class TestLogToExcel(unittest.TestCase):
                                      'Timestamp': datetime.now()}])
 
 
+class TestInvalidExcelLogging(unittest.TestCase):
+    def test_invalid_data_format(self):
+        # Passing a dictionary instead of expected format
+        # (e.g., list or DataFrame)
+        invalid_data = {'key': 'value'}
+        # Assuming ValueError is raised for invalid data
+        with self.assertRaises(ValueError):
+            log_to_excel(invalid_data, 'invalid_file.txt')
+
+    def test_invalid_column_names(self):
+        # Mock data with invalid column names for Excel logging
+        invalid_data = pd.DataFrame({'InvalidCol': ['Test']})
+        # Assuming a KeyError if specific columns are missing
+        with self.assertRaises(KeyError):
+            log_to_excel(invalid_data)
+
+
 if __name__ == '__main__':
     unittest.main()
