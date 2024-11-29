@@ -6,6 +6,24 @@ from main import log_to_excel
 import os
 
 
+def read_txt(file_path):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            return file.read()  # Return the file contents as a string
+    except Exception as e:
+        print(f"Error reading text file {file_path}: {e}")
+        return None
+
+
+def read_csv(file_path):
+    try:
+        # Uses pandas to read the CSV into a DataFrame
+        return pd.read_csv(file_path)
+    except Exception as e:
+        print(f"Error reading CSV file {file_path}: {e}")
+        return None
+
+
 class TestLogToExcel(unittest.TestCase):
 
     @patch('main.pd.DataFrame')  # Mock the DataFrame constructor
@@ -64,6 +82,29 @@ class TestExcelFileOpen(unittest.TestCase):
         except PermissionError:
             self.fail("PermissionError: Excel file is open. \
                       Logging should handle this gracefully.")
+
+
+class TestLargeFileHandling(unittest.TestCase):
+    def test_read_large_txt(self):
+        # Creating a large test file
+        with open('large_test.txt', 'w') as f:
+            f.write("A" * 10**6)  # 1MB of 'A's
+
+        result = read_txt('large_test.txt')
+        # Should return a result without memory issues
+        self.assertIsNotNone(result)
+        os.remove('large_test.txt')  # Clean up
+
+    def test_read_large_csv(self):
+        # Creating a large test CSV file
+        large_csv = pd.DataFrame({'Column1': ['A']*10**6,
+                                  'Column2': ['B']*10**6})
+        large_csv.to_csv('large_test.csv',
+                         index=False)
+
+        result = read_csv('large_test.csv')
+        self.assertIsNotNone(result)  # Should handle large CSV without issue
+        os.remove('large_test.csv')  # Clean up
 
 
 if __name__ == '__main__':
