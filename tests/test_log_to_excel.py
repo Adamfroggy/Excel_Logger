@@ -123,6 +123,13 @@ class TestExcelFileOpen(unittest.TestCase):
                       Logging should handle this gracefully.")
 
 
+class TestUnsupportedFileHandling(unittest.TestCase):
+    def test_unsupported_file_type(self):
+        # Adjust exception type if specific error is expected
+        with self.assertRaises(Exception):
+            log_document('unsupported_file.xyz')
+
+
 class TestLargeFileHandling(unittest.TestCase):
     def test_read_large_txt(self):
         # Creating a large test file
