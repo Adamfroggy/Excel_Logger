@@ -25,6 +25,24 @@ def read_csv(file_path):
         return None
 
 
+class TestEmptyFileHandling(unittest.TestCase):
+    def test_read_empty_txt(self):
+        # Create an empty file
+        open('empty_test.txt', 'w').close()
+
+        result = read_txt('empty_test.txt')
+        self.assertEqual(result, '')  # Expect empty string
+        os.remove('empty_test.txt')  # Clean up
+
+    def test_read_empty_csv(self):
+        # Create an empty CSV file
+        pd.DataFrame().to_csv('empty_test.csv', index=False)
+
+        result = read_csv('empty_test.csv')
+        self.assertTrue(result.empty)  # Expect an empty DataFrame
+        os.remove('empty_test.csv')  # Clean up
+
+
 class TestLoggingErrors(unittest.TestCase):
     def test_invalid_file_path(self):
         # Adjust exception type if specific error is expected
