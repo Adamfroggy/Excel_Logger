@@ -177,16 +177,18 @@ class TestCorruptedFileHandling(unittest.TestCase):
 
 
 class TestConcurrentLogging(unittest.TestCase):
+
     def log_data_concurrently(self, data, file_name):
         log_to_excel(data, file_name)
 
     def test_concurrent_logging(self):
+        # Define test data and file names
         data1 = ["Test content 1."]
         data2 = ["Test content 2."]
         file_name1 = 'concurrent_file1.txt'
         file_name2 = 'concurrent_file2.txt'
 
-        # Start two threads to log data concurrently
+        # Start threads for concurrent logging
         thread1 = threading.Thread(target=self.log_data_concurrently,
                                    args=(data1, file_name1))
         thread2 = threading.Thread(target=self.log_data_concurrently,
@@ -198,12 +200,12 @@ class TestConcurrentLogging(unittest.TestCase):
         thread1.join()
         thread2.join()
 
-        # Check that both files are logged
+        # Validate the log file contents
         logged_data = pd.read_excel('doc_log.xlsx')
-        self.assertIn('concurrent_file1.txt',
-                      logged_data['Document Name'].values)
-        self.assertIn('concurrent_file2.txt',
-                      logged_data['Document Name'].values)
+        self.assertIn(file_name1, logged_data['Document Name'].values)
+        self.assertIn(file_name2, logged_data['Document Name'].values)
+        self.assertIn("Test content 1.", logged_data['Content'].values)
+        self.assertIn("Test content 2.", logged_data['Content'].values)
 
 
 if __name__ == '__main__':
