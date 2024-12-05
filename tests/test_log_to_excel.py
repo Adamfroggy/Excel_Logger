@@ -25,6 +25,20 @@ def read_csv(file_path):
         return None
 
 
+class TestDuplicateLogging(unittest.TestCase):
+    def test_no_duplicate_logs(self):
+        data = [{'Document Name': 'sample.txt', 'Content': 'Test content',
+                 'Timestamp': '2024-12-01'}]
+
+        log_to_excel(data)
+        log_to_excel(data)  # Log same data again
+
+        logged_data = pd.read_excel('doc_log.xlsx')
+        self.assertEqual(len(logged_data
+                             [logged_data
+                              ['Document Name'] == 'sample.txt']), 1)
+
+
 class TestEmptyFileHandling(unittest.TestCase):
     def test_read_empty_txt(self):
         # Create an empty file
