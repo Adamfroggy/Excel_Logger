@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 from datetime import datetime
 import pandas as pd
-from main import log_to_excel
+from main import log_to_excel, log_document
 import os
 import threading
 
@@ -25,8 +25,14 @@ def read_csv(file_path):
         return None
 
 
-class TestLogToExcel(unittest.TestCase):
+class TestLoggingErrors(unittest.TestCase):
+    def test_invalid_file_path(self):
+        # Adjust exception type if specific error is expected
+        with self.assertRaises(Exception):
+            log_document('non_existent_file.txt')
 
+
+class TestLogToExcel(unittest.TestCase):
     @patch('main.pd.DataFrame')  # Mock the DataFrame constructor
     @patch('main.os.path.exists')  # Mock os.path.exists
     @patch('main.pd.ExcelWriter')  # Mock ExcelWriter
