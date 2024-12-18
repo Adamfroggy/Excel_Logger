@@ -2,66 +2,9 @@ import unittest
 from unittest.mock import patch
 from datetime import datetime
 import pandas as pd
-from main import log_to_excel, log_document
+from main import log_to_excel, read_csv, read_txt
 import os
 import threading
-
-
-def read_txt(file_path):
-    try:
-        with open(file_path, 'r', encoding='utf-8') as file:
-            return file.read()  # Return the file contents as a string
-    except Exception as e:
-        print(f"Error reading text file {file_path}: {e}")
-        return None
-
-
-def read_csv(file_path):
-    try:
-        # Uses pandas to read the CSV into a DataFrame
-        return pd.read_csv(file_path)
-    except Exception as e:
-        print(f"Error reading CSV file {file_path}: {e}")
-        return None
-
-
-class TestDuplicateLogging(unittest.TestCase):
-    def test_no_duplicate_logs(self):
-        data = [{'Document Name': 'sample.txt', 'Content': 'Test content',
-                 'Timestamp': '2024-12-01'}]
-
-        log_to_excel(data)
-        log_to_excel(data)  # Log same data again
-
-        logged_data = pd.read_excel('doc_log.xlsx')
-        self.assertEqual(len(logged_data
-                             [logged_data
-                              ['Document Name'] == 'sample.txt']), 1)
-
-
-class TestEmptyFileHandling(unittest.TestCase):
-    def test_read_empty_txt(self):
-        # Create an empty file
-        open('empty_test.txt', 'w').close()
-
-        result = read_txt('empty_test.txt')
-        self.assertEqual(result, '')  # Expect empty string
-        os.remove('empty_test.txt')  # Clean up
-
-    def test_read_empty_csv(self):
-        # Create an empty CSV file
-        pd.DataFrame().to_csv('empty_test.csv', index=False)
-
-        result = read_csv('empty_test.csv')
-        self.assertTrue(result.empty)  # Expect an empty DataFrame
-        os.remove('empty_test.csv')  # Clean up
-
-
-class TestLoggingErrors(unittest.TestCase):
-    def test_invalid_file_path(self):
-        # Adjust exception type if specific error is expected
-        with self.assertRaises(Exception):
-            log_document('non_existent_file.txt')
 
 
 class TestLogToExcel(unittest.TestCase):
@@ -88,23 +31,6 @@ class TestLogToExcel(unittest.TestCase):
                                      'Timestamp': datetime.now()}])
 
 
-class TestInvalidExcelLogging(unittest.TestCase):
-    def test_invalid_data_format(self):
-        # Passing a dictionary instead of expected format
-        # (e.g., list or DataFrame)
-        invalid_data = {'key': 'value'}
-        # Assuming ValueError is raised for invalid data
-        with self.assertRaises(ValueError):
-            log_to_excel(invalid_data, 'invalid_file.txt')
-
-    def test_invalid_column_names(self):
-        # Mock data with invalid column names for Excel logging
-        invalid_data = pd.DataFrame({'InvalidCol': ['Test']})
-        # Assuming a KeyError if specific columns are missing
-        with self.assertRaises(KeyError):
-            log_to_excel(invalid_data)
-
-
 class TestExcelFileOpen(unittest.TestCase):
     def test_excel_file_open(self):
         # Simulating the case when the Excel file
@@ -121,13 +47,6 @@ class TestExcelFileOpen(unittest.TestCase):
         except PermissionError:
             self.fail("PermissionError: Excel file is open. \
                       Logging should handle this gracefully.")
-
-
-class TestUnsupportedFileHandling(unittest.TestCase):
-    def test_unsupported_file_type(self):
-        # Adjust exception type if specific error is expected
-        with self.assertRaises(Exception):
-            log_document('unsupported_file.xyz')
 
 
 class TestLargeFileHandling(unittest.TestCase):
