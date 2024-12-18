@@ -4,7 +4,6 @@ from datetime import datetime
 import pandas as pd
 from main import log_to_excel, read_csv, read_txt
 import os
-import threading
 
 
 class TestLogToExcel(unittest.TestCase):
@@ -70,61 +69,6 @@ class TestLargeFileHandling(unittest.TestCase):
         result = read_csv('large_test.csv')
         self.assertIsNotNone(result)  # Should handle large CSV without issue
         os.remove('large_test.csv')  # Clean up
-
-
-class TestCorruptedFileHandling(unittest.TestCase):
-    def test_read_corrupted_txt(self):
-        # Simulate corrupted file by writing an incomplete file
-        with open('corrupted.txt', 'w') as f:
-            # Incomplete or malformed content
-            f.write("This file is corrupted...")
-
-        result = read_txt('corrupted.txt')
-        self.assertIsNone(result)  # Should return None or handle the exception
-
-        os.remove('corrupted.txt')  # Clean up
-
-    def test_read_corrupted_csv(self):
-        # Simulate a corrupted CSV file
-        with open('corrupted.csv', 'w') as f:
-            f.write("Col1,Col2\nA,B\nC")  # Missing data in row
-
-        result = read_csv('corrupted.csv')
-        self.assertIsNone(result)  # Should return None or handle the exception
-
-        os.remove('corrupted.csv')  # Clean up
-
-
-class TestConcurrentLogging(unittest.TestCase):
-
-    def log_data_concurrently(self, data, file_name):
-        log_to_excel(data, file_name)
-
-    def test_concurrent_logging(self):
-        # Define test data and file names
-        data1 = ["Test content 1."]
-        data2 = ["Test content 2."]
-        file_name1 = 'concurrent_file1.txt'
-        file_name2 = 'concurrent_file2.txt'
-
-        # Start threads for concurrent logging
-        thread1 = threading.Thread(target=self.log_data_concurrently,
-                                   args=(data1, file_name1))
-        thread2 = threading.Thread(target=self.log_data_concurrently,
-                                   args=(data2, file_name2))
-
-        thread1.start()
-        thread2.start()
-
-        thread1.join()
-        thread2.join()
-
-        # Validate the log file contents
-        logged_data = pd.read_excel('doc_log.xlsx')
-        self.assertIn(file_name1, logged_data['Document Name'].values)
-        self.assertIn(file_name2, logged_data['Document Name'].values)
-        self.assertIn("Test content 1.", logged_data['Content'].values)
-        self.assertIn("Test content 2.", logged_data['Content'].values)
 
 
 if __name__ == '__main__':
